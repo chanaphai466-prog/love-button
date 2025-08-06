@@ -1,30 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>เฌอรักพี่มั้ย?</title>
   <style>
     body {
       background-color: #ffe6f0;
       font-family: 'Arial', sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding: 20px;
       overflow: hidden;
       position: relative;
+      font-size: 5vw;
+      margin: 0;
+      height: 100vh;
+      box-sizing: border-box;
     }
     h1 {
       color: #ff3399;
-      font-size: 2.5em;
+      font-size: 8vw;
+      margin-bottom: 30px;
     }
     .btn {
-      padding: 15px 30px;
-      font-size: 1.2em;
+      padding: 15px 25px;
+      font-size: 6vw;
       margin: 20px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s ease;
+      position: relative;
     }
     #loveBtn {
       background-color: #ff66b2;
@@ -33,29 +39,22 @@
     #noBtn {
       background-color: #cccccc;
       color: #333;
-      position: relative;
+      position: fixed;
+      cursor: pointer;
     }
     #message {
-      font-size: 2em;
+      font-size: 8vw;
       color: #ff3399;
       margin-top: 50px;
       display: none;
-    }
-    .heart, .cat {
-      position: absolute;
-      width: 50px;
-      animation: float 6s infinite ease-in-out;
-    }
-    @keyframes float {
-      0% { transform: translateY(100vh); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateY(-200px); opacity: 0; }
     }
     canvas {
       position: fixed;
       top: 0;
       left: 0;
       pointer-events: none;
+      width: 100vw;
+      height: 100vh;
     }
   </style>
 </head>
@@ -83,29 +82,42 @@
       launchConfetti();
     };
 
-    noBtn.onclick = () => {
-      loveBtnSize += 0.2;
-      loveBtn.style.transform = `scale(${loveBtnSize})`;
-      dingSound.play();
-      if (loveBtnSize > 2.4) {
-        noBtn.style.display = 'none';
-      }
-    };
+    noBtn.addEventListener('mouseenter', () => {
+      moveNoBtnRandomly();
+    });
 
+    noBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      moveNoBtnRandomly();
+    });
+
+    function moveNoBtnRandomly() {
+      const maxX = window.innerWidth - noBtn.offsetWidth;
+      const maxY = window.innerHeight - noBtn.offsetHeight;
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+      noBtn.style.left = randomX + 'px';
+      noBtn.style.top = randomY + 'px';
+    }
+
+    // ฟังก์ชันสร้างหัวใจและแมวลอย
     function createFloatingElement(emoji) {
       const elem = document.createElement('div');
       elem.textContent = emoji;
+      elem.style.position = 'absolute';
       elem.style.left = Math.random() * window.innerWidth + 'px';
       elem.style.top = '100%';
       elem.style.fontSize = '2em';
-      elem.className = emoji === "💖" ? 'heart' : 'cat';
+      elem.style.userSelect = 'none';
+      elem.style.pointerEvents = 'none';
+      elem.style.animation = 'float 6s infinite ease-in-out';
       document.body.appendChild(elem);
       setTimeout(() => elem.remove(), 6000);
     }
 
     setInterval(() => createFloatingElement(Math.random() > 0.5 ? "💖" : "🐱"), 800);
 
-    // พลุ (confetti) จาก Canvas
+    // พลุ (confetti) บน canvas
     const canvas = document.getElementById('confetti');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -141,6 +153,27 @@
     }
 
     drawConfetti();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      moveNoBtnRandomly();
+    });
+
+    // animation ของหัวใจและแมวลอย
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = `
+      @keyframes float {
+        0% { transform: translateY(100vh); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateY(-200px); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // เริ่มให้ปุ่มไม่รักวิ่งตอนเปิดหน้า
+    moveNoBtnRandomly();
   </script>
 </body>
 </html>
