@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>เฌอรักพี่มั้ย?</title>
+  <style>
+    body {
+      background-color: #ffe6f0;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      overflow: hidden;
+      position: relative;
+    }
+    h1 {
+      color: #ff3399;
+      font-size: 2.5em;
+    }
+    .btn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      margin: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #loveBtn {
+      background-color: #ff66b2;
+      color: white;
+    }
+    #noBtn {
+      background-color: #cccccc;
+      color: #333;
+      position: relative;
+    }
+    #message {
+      font-size: 2em;
+      color: #ff3399;
+      margin-top: 50px;
+      display: none;
+    }
+    .heart, .cat {
+      position: absolute;
+      width: 50px;
+      animation: float 6s infinite ease-in-out;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-200px); opacity: 0; }
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>เฌอรักพี่มั้ย? 💖</h1>
+  <button class="btn" id="loveBtn">รัก</button>
+  <button class="btn" id="noBtn">ไม่รัก</button>
+  <div id="message">เย้~ รักเหมือนกันนะงับ 🥰</div>
+
+  <audio id="dingSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+  <canvas id="confetti"></canvas>
+
+  <script>
+    const loveBtn = document.getElementById('loveBtn');
+    const noBtn = document.getElementById('noBtn');
+    const message = document.getElementById('message');
+    const dingSound = document.getElementById('dingSound');
+    let loveBtnSize = 1.0;
+
+    loveBtn.onclick = () => {
+      message.style.display = 'block';
+      loveBtn.style.display = 'none';
+      noBtn.style.display = 'none';
+      dingSound.play();
+      launchConfetti();
+    };
+
+    noBtn.onclick = () => {
+      loveBtnSize += 0.2;
+      loveBtn.style.transform = `scale(${loveBtnSize})`;
+      dingSound.play();
+      if (loveBtnSize > 2.4) {
+        noBtn.style.display = 'none';
+      }
+    };
+
+    function createFloatingElement(emoji) {
+      const elem = document.createElement('div');
+      elem.textContent = emoji;
+      elem.style.left = Math.random() * window.innerWidth + 'px';
+      elem.style.top = '100%';
+      elem.style.fontSize = '2em';
+      elem.className = emoji === "💖" ? 'heart' : 'cat';
+      document.body.appendChild(elem);
+      setTimeout(() => elem.remove(), 6000);
+    }
+
+    setInterval(() => createFloatingElement(Math.random() > 0.5 ? "💖" : "🐱"), 800);
+
+    // พลุ (confetti) จาก Canvas
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+
+    function launchConfetti() {
+      for (let i = 0; i < 150; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 2,
+          d: Math.random() * 5 + 1,
+          color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+          tilt: Math.random() * 10 - 10
+        });
+      }
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((c, i) => {
+        ctx.beginPath();
+        ctx.fillStyle = c.color;
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2, false);
+        ctx.fill();
+        c.y += c.d;
+        c.x += Math.sin(c.tilt);
+        if (c.y > canvas.height) confetti.splice(i, 1);
+      });
+      requestAnimationFrame(drawConfetti);
+    }
+
+    drawConfetti();
+  </script>
+</body>
+</html>
